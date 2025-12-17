@@ -12,16 +12,21 @@ public class Interaction {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	long id;
+	private long id;
 
-	InteractionType interactionType;
+	@Enumerated(EnumType.STRING)
+	private InteractionType interactionType;
 
-	LocalDate interactionDate;
+	private LocalDate interactionDate;
 
-	String commentaire;
+	private String comment;
+
+	@ManyToOne
+	@JoinColumn(name = "client_id")
+	private Client client;
 
 	@ManyToOne
 	@JoinColumn(name = "opportunity_id")
-	Opportunity opportunity;
+	private Opportunity opportunity;
 
 }
