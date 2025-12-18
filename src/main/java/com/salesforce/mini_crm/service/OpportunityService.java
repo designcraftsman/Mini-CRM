@@ -60,4 +60,34 @@ public class OpportunityService {
 		);
 	}
 
+	public void deleteOpportunityById(Long id) {
+		opportunityRepository.deleteById(id);
+	}
+
+	public OpportunityResponseDto updateOpportunity(Long id, AddOpportunityDto addOpportunityDto) {
+		Optional<Opportunity> opportunityOpt = opportunityRepository.findById(id);
+		if(opportunityOpt.isEmpty() || addOpportunityDto==null) {
+			return null;
+		}
+		Opportunity opportunity = opportunityOpt.get();
+
+		Client client = clientRepository.findById(addOpportunityDto.clientId()).orElse(null);
+
+		opportunity.setClient(client);
+		opportunity.setName(addOpportunityDto.name());
+		opportunity.setEstimatedAmount(addOpportunityDto.estimatedAmount());
+		opportunity.setExpectedCloseDate(LocalDate.parse(addOpportunityDto.expectedCloseDate()));
+		opportunity.setStatus(addOpportunityDto.status());
+
+		Opportunity savedOpportunity = opportunityRepository.save(opportunity);
+
+		return new OpportunityResponseDto(
+				savedOpportunity.getClient(),
+				savedOpportunity.getName(),
+				savedOpportunity.getEstimatedAmount(),
+				savedOpportunity.getStatus(),
+				savedOpportunity.getExpectedCloseDate().toString()
+		);
+	}
+
 }

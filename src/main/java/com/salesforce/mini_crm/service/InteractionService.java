@@ -127,17 +127,24 @@ public class InteractionService {
 	public List<InteractionResponseDto> getInteractionsByClientId(Long clientId) {
 		Client client = clientRepository.findById(clientId)
 				.orElseThrow(() -> new IllegalArgumentException("Client not found with id: " + clientId));
-		List<Interaction> interactions = interactionRepository.findAll().stream()
-				.filter(interaction -> interaction.getClient().getId().equals(clientId))
-				.toList();
-		return interactions.stream()
-				.map(interaction -> new InteractionResponseDto(
-						interaction.getInteractionType(),
-						interaction.getInteractionDate().toString(),
-						interaction.getComment(),
-						interaction.getClient().getId(),
-						interaction.getOpportunity() != null ? interaction.getOpportunity().getId() : null
+		Optional<Interaction> interactions = interactionRepository.findByClient(client);
+		if (interactions.isEmpty()) {
+			throw new IllegalArgumentException("No interactions found for client with id: " + clientId);
+		}
+		List<InteractionListResponseDto> interactionListResponseDtos = interactions.stream()
+				.map(interaction -> new InteractionListResponseDto(
+						List.of(new InteractionResponseDto(
+								interaction.getInteractionType(),
+								interaction.getInteractionDate().toString(),
+								interaction.getComment(),
+								interaction.getClient().getId(),
+								interaction.getOpportunity() != null ? interaction.getOpportunity().getId() : null
+						)),
+						1
 				))
+				.toList();
+		return interactionListResponseDtos.stream()
+				.flatMap(interactionListResponseDto -> interactionListResponseDto.interactionList().stream())
 				.toList();
 	}
 }
