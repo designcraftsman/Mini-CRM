@@ -1,9 +1,12 @@
 package com.salesforce.mini_crm.dto.response;
 
+import com.salesforce.mini_crm.enums.OpportunityStatus;
+import com.salesforce.mini_crm.model.Client;
+
 public record OpportunityResponseDto(
+		Client client,
 		String name,
-		String description,
 		Double amount,
-		String status,
+		OpportunityStatus status,
 		String expectedCloseDate
 ) { }
